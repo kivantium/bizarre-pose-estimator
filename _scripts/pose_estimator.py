@@ -7,6 +7,7 @@ from _util.pytorch_v1 import * ; import _util.pytorch_v1 as utorch
 from _util.twodee_v0 import * ; import _util.twodee_v0 as u2d
 
 import _util.keypoints_v0 as ukey
+import numpy as np
 
 
 parser = argparse.ArgumentParser()
@@ -137,6 +138,7 @@ v = img
 for k,(x,y) in zip(ukey.coco_keypoints, ans[0]['keypoints']):
     print((f'\t({x:.2f}, {y:.2f})'), k)
 print()
+np.save('./_samples/keypoints.npy', ans[0]['keypoints'])
 
 _visualize(img, ans[0]['bbox'], ans[0]['keypoints']).save('./_samples/character_pose_estim.png')
 print('output saved to ./_samples/character_pose_estim.png')
