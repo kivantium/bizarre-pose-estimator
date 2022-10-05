@@ -138,7 +138,8 @@ v = img
 for k,(x,y) in zip(ukey.coco_keypoints, ans[0]['keypoints']):
     print((f'\t({x:.2f}, {y:.2f})'), k)
 print()
-np.save('./_samples/keypoints.npy', ans[0]['keypoints'])
+d = scipy.spatial.distance.pdist(u2d.cropbox_points(ans[0]['keypoints'], *ans[0]['cropbox']))
+np.save('./_samples/results.npy', [ans[0]['keypoints'], ans[0]['cropbox'], d])
 
 _visualize(img, ans[0]['bbox'], ans[0]['keypoints']).save('./_samples/character_pose_estim.png')
 print('output saved to ./_samples/character_pose_estim.png')
