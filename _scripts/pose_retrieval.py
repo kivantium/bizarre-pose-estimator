@@ -8,6 +8,7 @@ from _util.twodee_v0 import * ; import _util.twodee_v0 as u2d
 
 import _util.keypoints_v0 as ukey
 
+import json
 
 parser = argparse.ArgumentParser()
 parser.add_argument('fn_img')
@@ -53,6 +54,19 @@ def infer_segmentation(self, images, bbox_thresh=0.5, return_more=True):
         anss.append(ans)
     return anss
 
+def _visualize(image=None, bbox=None, keypoints=None):
+    v = image
+    if bbox is not None:
+        v = v.rect(*bbox, c='r', w=2)
+    if keypoints is not None:
+        if isinstance(keypoints, dict):
+            keypoints = np.asarray([keypoints[k] for k in ukey.coco_keypoints])
+        for (a,b),c in zip(ukey.coco_parts, ukey.coco_part_colors):
+            v = v.line(keypoints[a], keypoints[b], w=5, c=c)
+        keypoints = keypoints[:len(ukey.coco_keypoints)]
+        for kp in keypoints:
+            v = v.dot(kp, s=5, c='r')
+    return v
 
 ######################## POSE ESTIMATOR ########################
 
@@ -159,7 +173,16 @@ print(Table([
     ],
 ]))
 
+_visualize(img, ans[0]['bbox'], ans[0]['keypoints']).save('./_samples/character_pose_estim.png')
 
-
-
-
+try:
+    result = [
+            {"rank": f'{i: 2d}',
+             "distance": f'{dt:.2f}',
+             "danbooru_id": f'{bns[v]}'}
+            for i,(v,dt) in enumerate(zip(idx[0],dist[0]))
+        ]
+    with open('./_samples/results.json', 'w') as f:
+        json.dump(result, f)
+except Exception as e:
+    print(e)
